@@ -341,13 +341,14 @@ bool VkTexLoadThread::loadResource(VkTexLoadIn &input, VkTexLoadOut &output) {
 			// GPU only textures cannot be trimmed or translated, so just do a straight read
 			size_t totalSize;
 			int numMipLevels;
-
+            TexFormat format;
 			assert(params->lump > 0);
 			FileReader reader = fileSystem.OpenFileReader(params->lump, FileSys::EReaderType::READER_NEW, 0);
-			output.isTranslucent = src->ReadCompressedPixels(&reader, &pixelData, totalSize, pixelDataSize, numMipLevels);
+			output.isTranslucent = src->ReadCompressedPixels(&reader, &pixelData, totalSize, pixelDataSize, numMipLevels, format);
 			reader.Close();
+
 			mipmap = false;
-			fmt = VK_FORMAT_BC7_UNORM_BLOCK;
+			fmt = VkHardwareTexture::GetVkInternalFormat(format);
 
 			output.totalDataSize = totalSize;
 

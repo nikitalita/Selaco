@@ -220,9 +220,9 @@ include( TargetArch )
 
 target_architecture(TARGET_ARCHITECTURE)
 
-if( ${TARGET_ARCHITECTURE} MATCHES "x86_64" )
-	set( HAVE_VM_JIT ON )
-endif()
+#if( ${TARGET_ARCHITECTURE} MATCHES "x86_64" )
+#	set( HAVE_VM_JIT ON )
+#endif()
 
 option (HAVE_VULKAN "Enable Vulkan support" ON)
 option (HAVE_GLES2 "Enable GLES2 support" ON)

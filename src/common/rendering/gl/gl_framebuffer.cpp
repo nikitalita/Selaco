@@ -92,7 +92,7 @@ extern bool vid_hdr_active;
 #define gl_setNULLContext() static_cast<Win32GLVideo*>(Video)->setNULLContext()
 #endif
 
-#ifdef __POSIX_SDL_GL_SYSFB_H__
+#if defined(__POSIX_SDL_GL_SYSFB_H__) || defined(COCOA_GL_SYSFB_H_INCLUDED)
 #include "hardware.h"
 #define gl_setAUXContext(a) static_cast<OpenGLFrameBuffer*>(screen)->setAuxContext(a)
 #define gl_numAUXContexts() static_cast<OpenGLFrameBuffer*>(screen)->numAuxContexts()
@@ -208,13 +208,14 @@ bool GlTexLoadThread::loadResource(GlTexLoadIn & input, GlTexLoadOut & output) {
 	else {
 		if (gpu) {
 			int numMipLevels;
+			TexFormat format;
 			FileReader reader = fileSystem.OpenFileReader(params->lump, FileSys::EReaderType::READER_NEW, FileSys::EReaderType::READERFLAG_SEEKABLE);
-			output.isTranslucent = src->ReadCompressedPixels(&reader, &pixelData, output.totalDataSize, pixelDataSize, numMipLevels);
+			output.isTranslucent = src->ReadCompressedPixels(&reader, &pixelData, output.totalDataSize, pixelDataSize, numMipLevels, format);
 			output.mipLevels = numMipLevels;
 			reader.Close();
 
 			if (uploadPossible) {
-				output.tex->BackgroundCreateCompressedTexture(pixelData, (uint32_t)pixelDataSize, (uint32_t)output.totalDataSize, buffWidth, buffHeight, input.texUnit, numMipLevels, "GlTexLoadThread::loadResource(Compressed)", !input.allowMipmaps);
+				output.tex->BackgroundCreateCompressedTexture(pixelData, (uint32_t)pixelDataSize, (uint32_t)output.totalDataSize, buffWidth, buffHeight, input.texUnit, numMipLevels, format, "GlTexLoadThread::loadResource(Compressed)", !input.allowMipmaps);
 			}
 
 			if (input.spi.generateSpi) {
