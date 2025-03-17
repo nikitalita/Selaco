@@ -949,7 +949,7 @@ void FTextureManager::ParseTextureDef(int lump, FMultipatchTextureBuilder &build
 				try
 				{
 					int wadnum = fileSystem.GetFileContainer(lump);
-					int num = fileSystem.CheckNumForName(name, ns_sprites, wadnum, false);
+					int num = fileSystem.CheckNumForName(name.GetChars(), ns_sprites, wadnum, false);
 					auto fullName = num <= 0 ? nullptr : fileSystem.GetFileFullName(num);
 					texID = TexMan.CheckForTexture(fullName, ETextureType::Sprite);
 					tex = TexMan.GetGameTexture(texID, false);

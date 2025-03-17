@@ -246,6 +246,8 @@ def main():
                     filedata = convert_bc7_to_bc3(filedata, name)
                     # put filename in unix format (otherwise zip won't create directories inside zipfile)
                     outputzip.writestr(name.replace('\\', '/'), filedata)
+                if 'TEXTURES.WeaponSprites.txt' in name:
+                    outputzip.writestr(name.replace('\\', '/'), filedata)
                 bar()
     patchSelacoPreferences(iniFilePath, outputfile)
 

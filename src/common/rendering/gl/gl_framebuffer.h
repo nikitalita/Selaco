@@ -49,6 +49,7 @@ struct GlTexLoadOut {
 	size_t pixelsSize = 0, totalDataSize = 0;
 	int pixelW = 0, pixelH = 0, mipLevels = -1;
 	bool createMipmaps = false;
+	TexFormat format;
 };
 
 struct GLModelLoadIn {

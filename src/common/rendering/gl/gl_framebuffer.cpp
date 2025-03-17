@@ -212,6 +212,7 @@ bool GlTexLoadThread::loadResource(GlTexLoadIn & input, GlTexLoadOut & output) {
 			FileReader reader = fileSystem.OpenFileReader(params->lump, FileSys::EReaderType::READER_NEW, FileSys::EReaderType::READERFLAG_SEEKABLE);
 			output.isTranslucent = src->ReadCompressedPixels(&reader, &pixelData, output.totalDataSize, pixelDataSize, numMipLevels, format);
 			output.mipLevels = numMipLevels;
+			output.format = format;
 			reader.Close();
 
 			if (uploadPossible) {
@@ -579,7 +580,7 @@ void OpenGLFrameBuffer::UpdateBackgroundCache(bool flush) {
 			// If we have pixels to upload, upload them here
 			if (loaded.pixels) {
 				if (loaded.imgSource->IsGPUOnly()) {
-					loaded.tex->BackgroundCreateCompressedTexture(loaded.pixels, loaded.pixelsSize, loaded.totalDataSize, loaded.pixelW, loaded.pixelH, loaded.texUnit, loaded.mipLevels, "OpenGLFrameBuffer::UpdateBackgroundCache()", !loaded.createMipmaps);
+					loaded.tex->BackgroundCreateCompressedTexture(loaded.pixels, loaded.pixelsSize, loaded.totalDataSize, loaded.pixelW, loaded.pixelH, loaded.texUnit, loaded.mipLevels, loaded.format, "OpenGLFrameBuffer::UpdateBackgroundCache()", !loaded.createMipmaps);
 				}
 				else {
 					loaded.tex->BackgroundCreateTexture(loaded.pixels, loaded.pixelW, loaded.pixelH, loaded.texUnit, loaded.createMipmaps, false, "OpenGLFrameBuffer::UpdateBackgroundCache()", !loaded.createMipmaps);

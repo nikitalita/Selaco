@@ -586,7 +586,7 @@ bool FHardwareTexture::BindOrCreate(FTexture *tex, int texunit, int clampmode, i
 			size_t dataSize = 0, totalSize = 0;
 			unsigned char* pixelData;
 			TexFormat format;
-			src->ReadCompressedPixels(reader, &pixelData, totalSize, dataSize, numMipLevels, format);
+			src->ReadCompressedPixels(&reader, &pixelData, totalSize, dataSize, numMipLevels, format);
 			CreateCompressedTexture(pixelData, (uint32_t)dataSize, (uint32_t)totalSize, tex->GetWidth(), tex->GetHeight(), texunit, numMipLevels, format, "::BindOrCreate(Compressed)", !forcenofilter);
 
 			SetHardwareState(HardwareState::READY, texunit);

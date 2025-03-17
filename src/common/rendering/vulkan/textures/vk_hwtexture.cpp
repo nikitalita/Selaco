@@ -174,7 +174,7 @@ void VkHardwareTexture::CreateImage(FTexture *tex, int translation, int flags)
 			}
 
 			// Read pixels
-			src->ReadCompressedPixels(reader, &pixelData, totalDataSize, pixelDataSize, mipLevels, format);
+			src->ReadCompressedPixels(&reader, &pixelData, totalDataSize, pixelDataSize, mipLevels, format);
 			VkFormat fmt = GetVkInternalFormat(format);
 
 			// Create texture
