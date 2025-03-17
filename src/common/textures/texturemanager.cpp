@@ -46,6 +46,7 @@
 #include "image.h"
 #include "vectors.h"
 #include "animtexture.h"
+#include "engineerrors.h"
 #include "formats/multipatchtexture.h"
 #include "basics.h"
 #include "cmdlib.h"
@@ -940,12 +941,25 @@ void FTextureManager::ParseTextureDef(int lump, FMultipatchTextureBuilder &build
 			}
 
 			// Confirm that we have a valid texture name here
-			FTextureID texID = TexMan.CheckForTexture(name.GetChars(), ETextureType::Sprite);
+			FTextureID texID = TexMan.CheckForTexture(name.GetChars(), ETextureType::Sprite, 0);
 			FGameTexture *tex = TexMan.GetGameTexture(texID, false);
 			
 
 			if (!texID.isValid() || tex == nullptr) {
-				sc.ScriptMessage("Warning: Unknown sprite: %s",  name.GetChars());
+				try
+				{
+					int wadnum = fileSystem.GetFileContainer(lump);
+					int num = fileSystem.CheckNumForName(name, ns_sprites, wadnum, false);
+					auto fullName = num <= 0 ? nullptr : fileSystem.GetFileFullName(num);
+					texID = TexMan.CheckForTexture(fullName, ETextureType::Sprite);
+					tex = TexMan.GetGameTexture(texID, false);
+				}
+				catch (CRecoverableError &err) {
+					sc.ScriptError("Error: %s", err.GetMessage());
+				}
+			}
+			if (!texID.isValid() || tex == nullptr) {
+				sc.ScriptError("Warning: Unknown sprite: %s", name.GetChars());
 			}
 
 			double scalex = 3.0, scaley = 3.0;
