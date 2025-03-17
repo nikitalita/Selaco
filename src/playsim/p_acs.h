@@ -35,10 +35,10 @@
 #ifndef __P_ACS_H__
 #define __P_ACS_H__
 
+#include "files.h"
 #include "doomtype.h"
 #include "dthinker.h"
 #include "engineerrors.h"
-#include "files.h"
 
 #define LOCAL_SIZE				20
 #define NUM_MAPVARS				128

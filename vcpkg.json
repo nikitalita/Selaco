@@ -24,6 +24,32 @@
                     "platform": "(!windows & static) | (windows & static & staticcrt)"
                 }
             ]
+        },
+        "vcpkg-zmusic": {
+            "description": "Use zmusic provided by vcpkg.",
+            "dependencies": [
+                {
+                    "name": "zmusic",
+                    "default-features": false,
+                    "features": ["vcpkg-libsndfile", "vcpkg-glib"],
+                    "platform": "(!windows & static) | (windows & static & staticcrt)"
+                }
+            ]
+        },
+        "vcpkg-sdl2": {
+            "description": "Use SDL2 provided by vcpkg.",
+            "dependencies": [
+                {
+                    "name": "sdl2",
+                    "default-features": false,
+                    "features": ["vulkan"],
+                    "platform": "(!windows & static) | (windows & static & staticcrt)"
+                },
+                {
+                    "name": "vulkan",
+                    "platform": "(!windows & static) | (windows & static & staticcrt)"
+                }
+            ]
         }
     },
     "dependencies": [

@@ -94,14 +94,16 @@ def process_exe(module_name):
     # we're going to look for files, so firstly lets translate anything in the rpath
     for i in range(len(oldrpaths)):
         oldrpaths[i] = make_abs_path(oldrpaths[i])
-
+    added_dependencies = []
     # now convert any dylib paths to be in @rpath, then convert the path to be absolute
     for i in range(len(dependencies)):
         path = dependencies[i]
         dependency_dylib_name = os.path.split(path)[-1]
-        add_post_command(['install_name_tool', '-change', path, os.path.join("@rpath", dependency_dylib_name), module_name])
+        new_name = os.path.join("@rpath", dependency_dylib_name)
         dependencies[i] = make_abs_path(path, oldrpaths)
-
+        if new_name != path:
+            add_post_command(['install_name_tool', '-change', path, os.path.join("@rpath", dependency_dylib_name), module_name])
+            added_dependencies.append(dependencies[i])
     return dependencies
 
 # for each dylib, we need to
@@ -129,9 +131,14 @@ def process_dylib(module_path):
     module_path = os.path.join(framework_path, module_name)
     
     dependencies = get_local_dependencies(module_path)
+    
+    # filter out the dependencies that are equal to the module_path
+    dependencies = [os.path.split(dep)[-1] for dep in dependencies if os.path.join("@rpath", os.path.split(dep)[-1]) != dep]
+    if len(dependencies) == 0:
+        return []
+
     for i in range(len(dependencies)):
         dependencies[i] = make_abs_path(dependencies[i])
-
     # a dylib will return itself (or more likely a link to itself) as dependency[0], I'm not sure why this is 
     # but my guess is that if you load an outdated library then it'll follow the link and load the newer copy
     if len(dependencies):

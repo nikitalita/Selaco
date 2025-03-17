@@ -1,0 +1,85 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2bf102c..6b4ede0 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -4,6 +4,10 @@ if (VCPKG_LIBSNDFILE)
+ 	list(APPEND VCPKG_MANIFEST_FEATURES "vcpkg-libsndfile")
+ endif()
+ 
++if (VCPKG_GLIB)
++	list(APPEND VCPKG_MANIFEST_FEATURES "vcpkg-glib")
++endif()
++
+ project(ZMusic
+ 	VERSION 1.1.14
+ 	LANGUAGES C CXX
+@@ -15,6 +19,7 @@ if (VCPKG_TOOLCHAIN)
+  	endif()
+ 
+ 	option(VCPKG_LIBSNDFILE "Import libsndfile from vcpkg" OFF)
++	option(VCPKG_GLIB "Import glib from vcpkg" OFF)
+ else()
+ 	set(VCPKG_MANIFEST_FEATURES)
+ endif()
+diff --git a/source/CMakeLists.txt b/source/CMakeLists.txt
+index 60ed0cc..3a49f05 100644
+--- a/source/CMakeLists.txt
++++ b/source/CMakeLists.txt
+@@ -109,6 +109,14 @@ elseif(NOT ("vcpkg-libsndfile" IN_LIST VCPKG_MANIFEST_FEATURES))
+ 	endif()
+ endif()
+ 
++
++if ("vcpkg-glib" IN_LIST VCPKG_MANIFEST_FEATURES)
++	include( FindPkgConfig )
++	PKG_CHECK_MODULES(GLIB2 REQUIRED IMPORTED_TARGET glib-2.0)
++	list( APPEND PROJECT_LIBRARIES PkgConfig::GLIB2 )
++	# include_directories( ${GLIB2_INCLUDE_DIRS} )
++endif()
++
+ # System MIDI support
+ if(WIN32)
+ 	target_compile_definitions(zmusic-obj INTERFACE HAVE_SYSTEM_MIDI)
+diff --git a/thirdparty/fluidsynth/src/CMakeLists.txt b/thirdparty/fluidsynth/src/CMakeLists.txt
+index efcd28f..4d68bfb 100644
+--- a/thirdparty/fluidsynth/src/CMakeLists.txt
++++ b/thirdparty/fluidsynth/src/CMakeLists.txt
+@@ -155,8 +155,13 @@ target_include_directories ( fluidsynth PRIVATE
+ 
+ if (NOT WIN32)
+    find_package(PkgConfig REQUIRED)
+-   pkg_search_module(GLIB REQUIRED glib-2.0)
+-   target_include_directories ( fluidsynth PUBLIC ${GLIB_INCLUDE_DIRS} )
+-   target_link_libraries ( fluidsynth PUBLIC ${pkgcfg_lib_GLIB_glib-2.0} )
+-
++    if ("vcpkg-glib" IN_LIST VCPKG_MANIFEST_FEATURES)
++        PKG_CHECK_MODULES(GLIB2 REQUIRED IMPORTED_TARGET glib-2.0)
++        target_link_libraries( fluidsynth PUBLIC PkgConfig::GLIB2 )
++        target_include_directories( fluidsynth PUBLIC  ${GLIB2_INCLUDE_DIRS} )
++    else()
++        pkg_search_module(GLIB REQUIRED glib-2.0)
++        target_include_directories ( fluidsynth PUBLIC ${GLIB_INCLUDE_DIRS} )
++        target_link_libraries ( fluidsynth PUBLIC ${pkgcfg_lib_GLIB_glib-2.0} )
++    endif()
+ endif()
+diff --git a/vcpkg.json b/vcpkg.json
+index ca5b89d..ebf8914 100644
+--- a/vcpkg.json
++++ b/vcpkg.json
+@@ -16,6 +16,16 @@
+                     "features": [ "mpeg", "external-libs" ]
+                 }
+             ]
++        },
++        "vcpkg-glib":
++        {
++            "description": "Use GLib provided by vcpkg.",
++            "dependencies":
++            [
++                {
++                    "name": "glib"
++                }
++            ]
+         }
+     },
+     "dependencies": [

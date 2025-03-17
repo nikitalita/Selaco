@@ -1,0 +1,17 @@
+diff --git a/cmake/ZUtility.cmake b/cmake/ZUtility.cmake
+index 9076017..e5b920d 100644
+--- a/cmake/ZUtility.cmake
++++ b/cmake/ZUtility.cmake
+@@ -49,6 +49,12 @@ function(target_link_libraries_hidden Tgt)
+ 	get_property(TgtType TARGET "${Tgt}" PROPERTY TYPE)
+ 
+ 	foreach(Link IN LISTS Links)
++		string(FIND "${Link}" "$<LINK_ONLY:" LinkIndex)
++		if("${LinkIndex}" EQUAL -1)
++		else()
++			string(REGEX REPLACE "\\$<LINK_ONLY:([^>]*)>" "\\1" Link "${Link}")
++		endif()
++
+ 		if(TARGET "${Link}")
+ 			get_property(LinkImported TARGET "${Link}" PROPERTY IMPORTED)
+ 			get_property(LinkType TARGET "${Link}" PROPERTY TYPE)

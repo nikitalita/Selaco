@@ -5,7 +5,19 @@ import shutil
 import struct
 import re
 import zipfile
-from wand.image import Image
+# BEFORE we import wand, since the coders are REALLY STUPID, we have to set the MAGICK_HOME environment variable to actually find the thing
+# to the path of the ImageMagick installation, otherwise it won't work
+# try /opt/homebrew
+# cheeck the platform first
+if sys.platform == 'darwin':
+    os.environ['MAGICK_HOME'] = '/opt/homebrew'
+try:
+    from wand.image import Image
+except ImportError:
+    # try /usr/local
+    if sys.platform == 'darwin':
+        os.environ['MAGICK_HOME'] = '/usr/local'
+    from wand.image import Image
 from zipfile import ZipFile
 from alive_progress import alive_bar
 import Cocoa
@@ -133,6 +145,7 @@ def getPreferencesFileName():
 
 # apparently doom uses ini files, in a non standard ini file way, so we can't just use configparser
 def patchSelacoPreferences(fileName, autoLoad):
+    print('Patching ' + fileName + ' with ' + autoLoad)
     if os.path.exists(fileName):
         # selaco-ea.ini exists we need to patch it
         lines = []
@@ -206,10 +219,14 @@ def findFileInPath(paths, fileName):
 
 def main():
     iniFilePath = os.path.join(getPreferencesFileName())
+    print("ini file path: " + iniFilePath)
     wadSearchPaths = getWadSearchPath(iniFilePath)
+    
+    print('Searching for ' + GAME_WAD + ' in ' + str(wadSearchPaths))
     path = findFileInPath(wadSearchPaths, GAME_WAD)
     if not path:
-        raise "Unable to find Selaco.ipk3"
+        dt = "Unable to find Selaco.ipk3; tried: " + str(wadSearchPaths)
+        raise Exception(dt)
     inputfile = os.path.join(path, GAME_WAD)
     outputfile = os.path.join(path, 'dxt.pk3')
     if not inputfile:

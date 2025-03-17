@@ -1,0 +1,19 @@
+diff --git a/source/CMakeLists.txt b/source/CMakeLists.txt
+index 9e669e3..60ed0cc 100644
+--- a/source/CMakeLists.txt
++++ b/source/CMakeLists.txt
+@@ -74,6 +74,14 @@ endif()
+ 
+ if(DYN_SNDFILE)
+ 	target_compile_definitions(zmusic-obj INTERFACE HAVE_SNDFILE DYN_SNDFILE)
++elseif("vcpkg-libsndfile" IN_LIST VCPKG_MANIFEST_FEATURES)
++	find_package(MPG123 CONFIG REQUIRED)
++	if (MPG123_FOUND)
++		target_compile_definitions(zmusic-obj INTERFACE HAVE_MPG123)
++	endif()
++	find_package(SndFile CONFIG REQUIRED)
++	target_compile_definitions(zmusic-obj INTERFACE HAVE_SNDFILE)
++	target_link_libraries(zmusic-obj INTERFACE SndFile::sndfile)
+ else()
+ 	find_package(SndFile)
+ 

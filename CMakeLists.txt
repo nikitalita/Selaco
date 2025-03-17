@@ -24,6 +24,14 @@ if (OPENAL_SOFT_VCPKG)
 	list(APPEND VCPKG_MANIFEST_FEATURES "vcpkg-openal-soft")
 endif()
 
+if (ZMUSIC_VCPKG)
+	list(APPEND VCPKG_MANIFEST_FEATURES "vcpkg-zmusic")
+endif()
+
+if (SDL2_VCPKG)
+	list(APPEND VCPKG_MANIFEST_FEATURES "vcpkg-sdl2")
+endif()
+
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows" OR (NOT CMAKE_SYSTEM_NAME AND CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows"))
 	# Force static triplet on Windows
 	set(VCPKG_TARGET_TRIPLET "x64-windows-static")
@@ -37,6 +45,8 @@ endif()
 
 if (VCPKG_TOOLCHAIN)
 	option(OPENAL_SOFT_VCPKG "Use OpenAL from vcpkg" OFF)
+	option(ZMUSIC_VCPKG "Use zmusic from vcpkg" OFF)
+	option(SDL2_VCPKG "Use SDL2 from vcpkg" OFF)
 endif()
 
 if (NOT VCPKG_TOOLCHAIN)
