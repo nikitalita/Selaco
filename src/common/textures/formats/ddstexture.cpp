@@ -49,6 +49,7 @@
 ** the pixel data, it is fairly inefficient to process.
 */
 
+#include "ProcessDxtc.hpp"
 #include "files.h"
 #include "filesystem.h"
 #include "bitmap.h"
@@ -58,6 +59,10 @@
 #include "engineerrors.h"
 #include "texturemanager.h"
 #include "printf.h"
+#if defined(__APPLE__)
+#include "TextureHeader.hpp"
+#include "Decode.hpp"
+#endif
 
 // Since we want this to compile under Linux too, we need to define this
 // stuff ourselves instead of including a DirectX header.
@@ -597,6 +602,44 @@ FDDSTexture::FDDSTexture(int lumpnum) : FImageSource(lumpnum)
 	SetOffsets(0,0);
 }
 
+static void DecodeTexture(const uint64_t* src, uint32_t* dst, CodecType m_type, int width, int height)
+{
+
+	switch( m_type )
+	{
+	case Etc1:
+	case Etc2_RGB:
+		::DecodeRGB(src, dst, width, height);
+		break;
+	case Etc2_RGBA:
+		::DecodeRGBA(src, dst, width, height);
+		break;
+	case Etc2_R11:
+		::DecodeR(src, dst, width, height);
+		break;
+	case Etc2_RG11:
+		::DecodeRG(src, dst, width, height);
+		break;
+	case Bc1:
+		::DecodeBc1(src, dst, width, height);
+		break;
+	case Bc3:
+		::DecodeBc3(src, dst, width, height);
+		break;
+	case Bc4:
+		::DecodeBc4(src, dst, width, height);
+		break;
+	case Bc5:
+		::DecodeBc5(src, dst, width, height);
+		break;
+	case Bc7:
+		::DecodeBc7(src, dst, width, height);
+		break;
+	default:
+		assert( false );
+		break;
+	}
+}
 
 // Data must be interpreted, this may include mipmap data which may be used or discarded at will
 int FDDSTexture::ReadCompressedPixels(FileReader* reader, unsigned char** data, size_t& size, size_t& unitSize, int& mipLevels, TexFormat &format) {
@@ -612,13 +655,30 @@ int FDDSTexture::ReadCompressedPixels(FileReader* reader, unsigned char** data, 
 
 	unsigned char* cacheData = new unsigned char[lumpSize];
 	reader->Read(cacheData, lumpSize);
-	
+
 	*data = (unsigned char *)malloc(pixelDataSize);
 	unitSize = LinearSize;
 	size = pixelDataSize;
 	mipLevels = storedMips;
 	format = (TexFormat)Format;
 
+#if defined(__APPLE__)
+	if (pixelDataSize >= LinearSize) {
+		CodecType type;
+		int32_t width, height;
+		size_t dataOffset;
+		ProcessHeader(cacheData, type, width, height, dataOffset);
+		if (type != CodecType::Bc3)
+		{
+			uint32_t* dst = new uint32_t[width*height];
+			uint64_t* src = (uint64_t*)(cacheData + dataOffset);
+			DecodeTexture(src, dst, type, width, height);
+			CompressBc3( dst, (uint64_t*)*data, width * height / 16, width );
+			format = TexFormat::DXT5;
+			delete[]cacheData;
+		}
+	} else
+#endif
 	if (pixelDataSize >= LinearSize) {
 		// Copy data from file
 		memcpy(*data, cacheData + headerSize, pixelDataSize);

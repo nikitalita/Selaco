@@ -54,6 +54,9 @@
     },
     "dependencies": [
         {
+            "name": "libpng"
+        },
+        {
             "name": "bzip2",
             "platform": "(!windows & static) | (windows & static & staticcrt)"
         },

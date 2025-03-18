@@ -329,6 +329,10 @@ add_custom_target( revision_check ALL
 )
 
 # required libraries
+# if apple
+if (APPLE)
+	list( APPEND PROJECT_LIBRARIES etcpak-lib )
+endif ()
 
 set( PROJECT_LIBRARIES ${PROJECT_LIBRARIES} miniz "${BZIP2_LIBRARIES}" "${CMAKE_DL_LIBS}" "${DRPC_LIBRARIES}")
 if (HAVE_VULKAN)

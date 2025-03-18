@@ -415,6 +415,10 @@ install(DIRECTORY docs/
 
 option( DYN_OPENAL "Dynamically load OpenAL" ON )
 
+if (APPLE)
+	add_subdirectory( libraries/etcpak )
+endif ()
+
 add_subdirectory( libraries/lzma )
 add_subdirectory( libraries/miniz )
 add_subdirectory( tools )

@@ -1,3 +1,4 @@
+set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
 make_release_only()
 
 if (MSVC)
