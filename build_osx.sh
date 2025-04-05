@@ -4,7 +4,16 @@
 set -e
 
 GZDOOMCONFIG="-DCMAKE_BUILD_TYPE=Release -DOSX_COCOA_BACKEND=OFF -DOPENAL_SOFT_VCPKG=ON -DLIBVPX_VCPKG=ON -DSDL2_VCPKG=ON -DZMUSIC_VCPKG=ON -DFORCE_INTERNAL_JPEG=ON -DFORCE_INTERNAL_BZIP2=ON -DFORCE_INTERNAL_ZLIB=ON"
-TOOLCHAIN_FILE=/Users/nikita/workspace/vcpkg/scripts/buildsystems/vcpkg.cmake
+TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake
+
+# install vcpkg
+if [ ! -d "vcpkg" ]; then
+    git clone https://github.com/microsoft/vcpkg.git
+    cd vcpkg
+    ./bootstrap-vcpkg.sh
+    cd ..
+fi
+
 NPROC=$(sysctl -n hw.ncpu)
 
 X86_DEPLOY_TARGET=10.15

@@ -46,3 +46,4 @@ cmake-build-*/
 build_arm64/
 build_x86_64/
 build_universal/
+vcpkg/
